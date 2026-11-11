@@ -1,66 +1,275 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Book Store API
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+RESTful API for managing a book catalog, built with Laravel, PHP 8 and MySQL/SQLite.
 
-## About Laravel
+## Overview
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+The Book Store API provides authentication and CRUD operations for managing books through JSON endpoints.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Technology Stack
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- PHP 8+
+- Laravel 7+
+- MySQL or SQLite
+- Laravel Sanctum for API authentication
+- PHPUnit for automated tests
 
-## Learning Laravel
+## Features
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+- User authentication with email and password.
+- Token-based authentication using Laravel Sanctum.
+- Login and logout endpoints.
+- Book registration, listing, retrieval, updating and deletion.
+- Request validation.
+- Unique ISBN validation.
+- Automated feature tests.
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+## Installation
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### 1. Clone the repository
 
-## Laravel Sponsors
+```bash
+git clone <repository-url>
+cd bookstore-app
+```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+### 2. Install dependencies
 
-### Premium Partners
+```bash
+composer install
+```
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+### 3. Configure environment
 
-## Contributing
+Copy the example environment file:
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+```bash
+cp .env.example .env
+```
 
-## Code of Conduct
+Generate the application key:
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+```bash
+php artisan key:generate
+```
 
-## Security Vulnerabilities
+Configure your database connection in `.env`.
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+Example using MySQL:
+
+```env
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=bookstore
+DB_USERNAME=root
+DB_PASSWORD=
+```
+
+### 4. Run migrations and seeders
+
+```bash
+php artisan migrate --seed
+```
+
+### 5. Start the application
+
+```bash
+php artisan serve
+```
+
+The API will be available at:
+
+```text
+http://127.0.0.1:8000/api
+```
+
+## Demo Credentials
+
+The database seeder creates a demonstration user:
+
+| Field | Value |
+|---|---|
+| Email | admin@bookstore.dev |
+| Password | BookStore@2026 |
+
+These credentials are intended for local demonstration and testing only.
+
+## Authentication
+
+The API uses Laravel Sanctum Personal Access Tokens.
+
+### Login
+
+**POST** `/api/login`
+
+Request:
+
+```json
+{
+    "email": "admin@bookstore.dev",
+    "password": "BookStore@2026"
+}
+```
+
+The response includes an authentication token.
+
+Use the returned token in subsequent requests:
+
+```http
+Authorization: Bearer YOUR_ACCESS_TOKEN
+Accept: application/json
+```
+
+### Logout
+
+**POST** `/api/logout`
+
+Requires authentication. Revokes the current access token.
+
+### Current User
+
+**GET** `/api/user`
+
+Requires authentication. Returns the authenticated user's information.
+
+## Book Endpoints
+
+All book endpoints require authentication.
+
+| Method | Endpoint | Description |
+|---|---|---|
+| GET | `/api/books` | List books |
+| POST | `/api/books` | Create a book |
+| GET | `/api/books/{id}` | Retrieve a book |
+| PUT | `/api/books/{id}` | Update a book |
+| DELETE | `/api/books/{id}` | Delete a book |
+
+### Create a Book
+
+**POST** `/api/books`
+
+Request:
+
+```json
+{
+    "name": "Clean Code",
+    "isbn": "9780132350884",
+    "value": 45.90
+}
+```
+
+The ISBN field is optional. If provided, it must contain numeric characters only and must be unique across the book catalog.
+
+A book can also be created without an ISBN:
+
+```json
+{
+    "name": "Domain-Driven Design",
+    "value": 59.90
+}
+```
+
+### Update a Book
+
+**PUT** `/api/books/{id}`
+
+Request:
+
+```json
+{
+    "name": "Clean Code - Updated Edition",
+    "isbn": "9780132350884",
+    "value": 49.90
+}
+```
+
+The ISBN uniqueness validation ignores the current book, allowing it to retain its existing ISBN while preventing duplication with another book.
+
+### Delete a Book
+
+**DELETE** `/api/books/{id}`
+
+Returns HTTP 204 when the book is successfully deleted.
+
+## Data Model
+
+### Book
+
+| Field | Type | Rules |
+|---|---|---|
+| id | Integer | Primary key |
+| name | String | Required, maximum 255 characters |
+| isbn | String | Optional, numeric characters only, unique |
+| value | Decimal(10,2) | Optional, numeric, non-negative |
+| created_at | Timestamp | Automatically managed |
+| updated_at | Timestamp | Automatically managed |
+
+### ISBN Business Rules
+
+- ISBN is optional.
+- When provided, ISBN must contain numbers only.
+- Each registered ISBN must be unique.
+- Duplicate ISBN values are rejected.
+- Multiple books may have a NULL ISBN.
+- During updates, a book may retain its own ISBN, but cannot use another book's ISBN.
+
+## Validation Rules
+
+| Field | Validation |
+|---|---|
+| name | Required, string, maximum 255 characters |
+| isbn | Nullable, string, numeric characters only, unique |
+| value | Nullable, numeric, minimum 0 |
+
+Validation errors return HTTP 422 with a JSON response.
+
+## HTTP Status Codes
+
+| Status | Description |
+|---|---|
+| 200 | Successful request |
+| 201 | Resource created |
+| 204 | Resource deleted |
+| 401 | Unauthenticated or invalid credentials |
+| 404 | Resource not found |
+| 422 | Validation error |
+
+## Running Tests
+
+Run the complete test suite:
+
+```bash
+php artisan test
+```
+
+Run authentication tests:
+
+```bash
+php artisan test tests/Feature/AuthTest.php
+```
+
+Run book tests:
+
+```bash
+php artisan test tests/Feature/BookTest.php
+```
+
+The test environment uses SQLite in-memory when configured in `phpunit.xml`, keeping automated tests isolated from the development database.
+
+## Design Decisions
+
+- **Laravel Sanctum:** provides lightweight token-based API authentication.
+- **Form Requests:** centralize request validation and keep controllers focused on business operations.
+- **API Resources:** standardize JSON responses.
+- **Eloquent ORM:** handles database operations and model persistence.
+- **Database constraints:** enforce ISBN uniqueness at the database level, in addition to application validation.
+- **Feature Tests:** verify authentication, authorization, CRUD operations and validation behavior.
 
 ## License
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+This project was developed as a technical assessment.
+
+## Developer
+
+Developed by [Luciano Junior](https://www.linkedin.com/in/luciano-marques-jr/)
